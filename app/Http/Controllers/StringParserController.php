@@ -11,14 +11,13 @@ class StringParserController extends Controller
         $input = $request->input('input_string');
 
         // Replace inconsistent delimiters with a single type of delimiter
-        $input = str_replace(['-', '//', '%'], '=', $input);
+        $input = str_replace(['//', '%'], '=', $input);
 
         // Split the string by commas
         $parts = explode(',', $input);
 
         $data = [
             'features' => [],
-            'feature_count' => 0,
         ];
 
         foreach ($parts as $part) {
@@ -37,24 +36,26 @@ class StringParserController extends Controller
             } elseif (strpos($key, 'type') !== false) {
                 $data['type'] = strtolower($value);
             } elseif (strpos($key, 'radius') !== false || strpos($key, 'direction') !== false || strpos($key, 'position') !== false) {
+                // Extract the id from the key
                 $id = (strpos($key, '-') !== false) ? explode('-', $key)[1] : 'default';
 
                 // Find the feature with the given ID, or create a new one if it doesn't exist
-                $feature = collect($data['features'])->firstWhere('id', $id);
-                if (!$feature) {
-                    $feature = ['id' => $id];
-                    $data['features'][] = &$feature;
+                if (!isset($data['features'][$id])) {
+                    $data['features'][$id] = ['id' => $id];
                 }
 
                 if (strpos($key, 'radius') !== false) {
-                    $feature['radius'] = intval($value);
+                    $data['features'][$id]['radius'] = intval($value);
                 } elseif (strpos($key, 'direction') !== false) {
-                    $feature['direction'] = floatval($value);
+                    $data['features'][$id]['direction'] = floatval($value);
                 } elseif (strpos($key, 'position') !== false) {
-                    $feature['position'][] = intval($value);
+                    $data['features'][$id]['position'][] = intval($value);
                 }
             }
         }
+
+        // Re-index the features array to be 0-indexed
+        $data['features'] = array_values($data['features']);
 
         // Count the number of features
         $data['feature_count'] = count($data['features']);

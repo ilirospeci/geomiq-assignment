@@ -29,6 +29,10 @@ php artisan serve
 6. **Test the API (Part A):**
 - Use a tool like Postman to test the endpoint: `http://127.0.0.1:8000/api/parse-string`.
 
+6. **Run PArseString Command (Part A):**
+- To run the ParseString command, use the following: 
+`php artisan parse:string "elapsed_time=0.0022132396697998047, type-CNC,radius-1-15,position-1=0.000000000000014,position-1//90,position-2=0%direction-1=-2.0816681711721685e-16"`.
+
 ---
 
 ## Assumptions:
